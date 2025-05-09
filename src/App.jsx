@@ -1,6 +1,7 @@
 import { useState} from 'react'
 
 import {BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AppProvider } from './contexto/contexto';
 
 import Aleatorios from './componentes/aleatorios'
 import Capturados from './componentes/capturados'
@@ -15,6 +16,7 @@ function App() {
   
 
   return (
+    <AppProvider>
     <Router>
       <Menu />
       <Routes>
@@ -26,6 +28,7 @@ function App() {
         <Route path="/Aleatorios" element={<Aleatorios/>}/>
       </Routes>
     </Router>
+    </AppProvider>
   )
 }
 

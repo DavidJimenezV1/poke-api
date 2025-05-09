@@ -1,12 +1,12 @@
-import { useState, useEffect} from 'react'
+import { useState, useEffect,useContext} from 'react'
+import { AppContext } from '../../contexto/contexto';
 import { useNavigate } from "react-router-dom";
 import './style.css'
 import Filtro from '../filtro'
 
 
 function Listas() {
-  const [data, setData] = useState([]);
-  const [tipoSeleccionado, setTipoSeleccionado] = useState('All');
+  const { data, setData, tipoSeleccionado, setTipoSeleccionado } = useContext(AppContext);
   const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
   useEffect(() => {
