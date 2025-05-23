@@ -1,8 +1,9 @@
+// src/App.jsx
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AppProvider } from './contexto/contexto';
 
-import { supabase } from "./supabase"; // <--- Agregar esta línea
+import { supabase } from "./supabase";
 
 import Menu from './componentes/menu';
 import Aleatorios from './componentes/aleatorios';
@@ -11,15 +12,16 @@ import Favoritos from './componentes/favoritos';
 import Listas from './componentes/listas';
 import Pokemon from './componentes/pokemon';
 import Usuarios from './componentes/usuario';
-import Login from './componentes/login'; // <--- Agregar esta línea
+import Login from './componentes/login';
+import Registro from './componentes/registro/index.jsx'; // <--- CAMBIO AQUÍ: ruta completa al archivo index.jsx
 
 import './App.css';
 
 function App() {
-  const [usuario, setUsuario] = useState(null); // <--- Agregar esta línea
-  const [cargando, setCargando] = useState(true); // <--- Agregar esta línea
+  const [usuario, setUsuario] = useState(null);
+  const [cargando, setCargando] = useState(true);
 
-  useEffect(() => { // <--- Agregar este bloque useEffect
+  useEffect(() => {
     async function verificarSesion() {
       const { data: { session } } = await supabase.auth.getSession();
       setUsuario(session?.user || null);
@@ -32,20 +34,21 @@ function App() {
     });
   }, []);
 
-  if (cargando) return <p>Cargando...</p>; // <--- Agregar esta línea
+  if (cargando) return <p>Cargando...</p>;
 
   return (
     <AppProvider>
       <Router>
-        {usuario && <Menu />} {/* <--- Modificar esta línea */}
+        {usuario && <Menu />}
         <Routes>
-          <Route path="/" element={usuario ? <Listas /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/Favoritos" element={usuario ? <Favoritos /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/Usuarios" element={usuario ? <Usuarios /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/Capturados" element={usuario ? <Capturados /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/Pokemon/:name" element={usuario ? <Pokemon /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/Aleatorios" element={usuario ? <Aleatorios /> : <Navigate to="/login" />} /> {/* <--- Modificar esta línea */}
-          <Route path="/login" element={<Login />} /> {/* <--- Agregar esta línea */}
+          <Route path="/" element={usuario ? <Listas /> : <Navigate to="/login" />} />
+          <Route path="/Favoritos" element={usuario ? <Favoritos /> : <Navigate to="/login" />} />
+          <Route path="/Usuarios" element={usuario ? <Usuarios /> : <Navigate to="/login" />} />
+          <Route path="/Capturados" element={usuario ? <Capturados /> : <Navigate to="/login" />} />
+          <Route path="/Pokemon/:name" element={usuario ? <Pokemon /> : <Navigate to="/login" />} />
+          <Route path="/Aleatorios" element={usuario ? <Aleatorios /> : <Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
         </Routes>
       </Router>
     </AppProvider>

@@ -1,147 +1,167 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react"; // Agregado useContext
 import { supabase } from "../../supabase";
+import { AppContext } from '../../contexto/contexto'; // Importa tu contexto si manejas el estado del usuario allí
+import { useNavigate } from 'react-router-dom'; // Para redirigir después de cerrar sesión
 
 export default function Usuario() {
-const [usuario, setUsuario] = useState(null);
-const [form, setForm] = useState({
-nombre: "",
-correo: "",
-fecha_nacimiento: "",
-telefono: "",
-roll: ""
-});
+  const [usuario, setUsuario] = useState(null);
+  const [form, setForm] = useState({
+    nombre: "",
+    correo: "",
+    fecha_nacimiento: "",
+    telefono: "",
+    roll: ""
+  });
 
-const [nuevaUrl, setNuevaUrl] = useState("");
-const [imagenes, setImagenes] = useState([]);
+  const [nuevaUrl, setNuevaUrl] = useState("");
+  const [imagenes, setImagenes] = useState([]);
 
-// Obtener datos del usuario
-useEffect(() => {
-async function fetchUsuario() {
-const { data: { user } } = await supabase.auth.getUser();
-if (user) {
-const { data, error } = await supabase
-.from("usuario")
-.select("*")
-.eq("id", user.id)
-.single();
-if (data) {
-setUsuario(data);
-setForm(data);
-fetchImagenes(user.id);
+  // Si `setAppUsuario` y `setTareas` se usan para el estado global de la app,
+  // se deben obtener del contexto. Si no, quítalas o decláralas localmente.
+  // const { setUsuario: setAppUsuario, setTareas } = useContext(AppContext); // Ejemplo de cómo obtenerlas del contexto
+  const navigate = useNavigate(); // Inicializar useNavigate
 
-}
-}
-}
+  // Obtener datos del usuario
+  useEffect(() => {
+    async function fetchUsuario() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from("usuario")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+        if (data) {
+          setUsuario(data);
+          setForm(data);
+          fetchImagenes(user.id);
+        }
+      }
+    }
 
-fetchUsuario();
-}, []);
+    fetchUsuario();
+  }, []);
 
-const fetchImagenes = async (usuarioid) => {
-const { data, error } = await supabase
-.from("multimedia")
-.select("*")
-.eq("usuarioid", usuarioid);
-if (data) setImagenes(data);
-};
+  const fetchImagenes = async (usuarioid) => {
+    const { data, error } = await supabase
+      .from("multimedia")
+      .select("*")
+      .eq("usuarioid", usuarioid);
+    if (error) {
+        console.error("Error al obtener imágenes:", error);
+    } else if (data) {
+        setImagenes(data);
+    }
+  };
 
-const handleChange = (e) => {
-setForm({ ...form, [e.target.name]: e.target.value });
-};
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-const handleUpdate = async () => {
-const { error } = await supabase
-.from("usuario")
-.update(form)
-.eq("id", usuario.id);
-if (error) alert("Error al actualizar");
-else alert("Datos actualizados");
-};
+  const handleUpdate = async () => {
+    const { error } = await supabase
+      .from("usuario")
+      .update(form)
+      .eq("id", usuario.id);
+    if (error) alert("Error al actualizar: " + error.message);
+    else alert("Datos actualizados");
+  };
 
-const handleAgregarUrl = async () => {
-if (!nuevaUrl.trim()) return;
+  const handleAgregarUrl = async () => {
+    if (!nuevaUrl.trim()) return;
 
-const { error } = await supabase
-.from("multimedia")
-.insert([{ url: nuevaUrl, usuarioid: usuario.id }]);
-if (error) {
-alert("Error al agregar la imagen");
-} else {
-setNuevaUrl("");
-fetchImagenes(usuario.id);
-}
-};
+    const { error } = await supabase
+      .from("multimedia")
+      .insert([{ url: nuevaUrl, usuarioid: usuario.id }]);
+    if (error) {
+      alert("Error al agregar la imagen: " + error.message);
+    } else {
+      setNuevaUrl("");
+      fetchImagenes(usuario.id);
+    }
+  };
 
-const handleEliminarImagen = async (id) => {
-const { error } = await supabase
-.from("multimedia")
-.delete()
-.eq("id", id);
-if (!error) {
-setImagenes(imagenes.filter((img) => img.id !== id));
-}
-};
+  const handleEliminarImagen = async (id) => {
+    const { error } = await supabase
+      .from("multimedia")
+      .delete()
+      .eq("id", id);
+    if (!error) {
+      setImagenes(imagenes.filter((img) => img.id !== id));
+      alert("Imagen eliminada");
+    } else {
+        alert("Error al eliminar la imagen: " + error.message);
+    }
+  };
 
-//cerrar sesion
-const handleLogout = async () => {
-await supabase.auth.signOut()
-setUser(null)
-setTareas([])
-}
+  // cerrar sesion
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        alert("Error al cerrar sesión: " + error.message);
+    } else {
+        // Asumiendo que el estado global del usuario se actualiza en App.jsx a través de onAuthStateChange
+        // Si el estado del usuario en App.jsx se gestiona fuera de onAuthStateChange,
+        // podrías necesitar llamar a setAppUsuario(null) aquí si lo tienes disponible en el contexto.
+        navigate("/login"); // Redirige al login después de cerrar sesión
+    }
+  };
 
-if (!usuario) return <p>Cargando...</p>;
+  if (!usuario) return <p>Cargando...</p>;
 
-return (
-<div>
-<h2>Perfil de Usuario</h2>
-<label>Nombre:
-<input name="nombre" value={form.nombre} onChange={handleChange} />
-</label><br />
-<label>Correo:
-<input name="correo" value={form.correo} onChange={handleChange} />
-</label><br />
-<label>Fecha de nacimiento:
-<input type="date" name="fecha_nacimiento"
-value={form.fecha_nacimiento} onChange={handleChange} />
-</label><br />
-<label>Teléfono:
-<input name="telefono" value={form.telefono} onChange={handleChange}
-/>
-</label><br />
-<label>Rol:
-<input name="roll" value={form.roll} onChange={handleChange} />
-</label><br />
-<button onClick={handleUpdate}>Guardar cambios</button>
+  return (
+    <div>
+      <h2>Perfil de Usuario</h2>
+      <label>
+        Nombre:
+        <input name="nombre" value={form.nombre} onChange={handleChange} />
+      </label><br />
+      <label>
+        Correo:
+        <input name="correo" value={form.correo} onChange={handleChange} />
+      </label><br />
+      <label>
+        Fecha de nacimiento:
+        <input type="date" name="fecha_nacimiento"
+          value={form.fecha_nacimiento} onChange={handleChange} />
+      </label><br />
+      <label>
+        Teléfono:
+        <input name="telefono" value={form.telefono} onChange={handleChange}
+        />
+      </label><br />
+      <label>
+        Rol:
+        <input name="roll" value={form.roll} onChange={handleChange} />
+      </label><br />
+      <button onClick={handleUpdate}>Guardar cambios</button>
 
-<hr />
+      <hr />
 
-<h3>Agregar imagen</h3>
-<input
-type="text"
-placeholder="URL de la imagen"
-value={nuevaUrl}
-onChange={(e) => setNuevaUrl(e.target.value)}
+      <h3>Agregar imagen</h3>
+      <input
+        type="text"
+        placeholder="URL de la imagen"
+        value={nuevaUrl}
+        onChange={(e) => setNuevaUrl(e.target.value)}
+      />
+      <button onClick={handleAgregarUrl}>Agregar</button>
 
-/>
-<button onClick={handleAgregarUrl}>Agregar</button>
-
-<h3>Imágenes guardadas</h3>
-<ul>
-{imagenes.map((img) => (
-<li key={img.id}>
-<img src={img.url} alt="Imagen" width="150" />
-<br />
-<button onClick={() =>
-
-handleEliminarImagen(img.id)}>Eliminar</button>
-
-</li>
-))}
-</ul>
-<hr />
-<h2>Quiero cerrar sesión</h2>
-<button onClick={handleLogout}>Cerrar sesión</button>
-{/* saltos de linea para que el menu no tape el boton */}
-<br /><br /><br /><br /><br />
-</div>
-);
+      <h3>Imágenes guardadas</h3>
+      <ul>
+        {imagenes.map((img) => (
+          <li key={img.id}>
+            <img src={img.url} alt="Imagen" width="150" />
+            <br />
+            <button onClick={() => handleEliminarImagen(img.id)}>Eliminar</button>
+          </li>
+        ))}
+      </ul>
+      <hr />
+      <h2>Quiero cerrar sesión</h2>
+      <button onClick={handleLogout}>Cerrar sesión</button>
+      {/* saltos de linea para que el menu no tape el boton */}
+      <br /><br /><br /><br /><br />
+    </div>
+  );
 }
