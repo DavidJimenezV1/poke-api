@@ -1,0 +1,31 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "Capacitor React App",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest", // O la imagen base que estés usando
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17", // Esto le indica a CodeSpaces que instale Java 17
+      "installGradle": "true" // Opcional, pero bueno para asegurar Gradle
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts" // Asegura Node.js LTS
+    },
+    "ghcr.io/devcontainers/features/common-utils:1": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "ms-vscode.atom-keybindings",
+        "vsls-contrib.codetour"
+      ]
+    }
+  },
+  "postCreateCommand": "npm install" // Ejecuta npm install después de crear el CodeSpace
+}
