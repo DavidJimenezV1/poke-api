@@ -65,7 +65,7 @@ function Administrador() {
         }));
 
         setUsuarios(usuariosConFotos);
-        setFotos(fotosData); // Aunque no se usa directamente en el renderizado principal, es útil mantenerlo
+        setFotos(fotosData);
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener los datos:", error);
@@ -82,14 +82,14 @@ function Administrador() {
         .from("usuario")
         .update({
           nombre: nuevoNombre,
-          correo: nuevoCorreo, // Asegúrate de que este campo esté en la tabla de Supabase
+          correo: nuevoCorreo,
           telefono: nuevoTelefono,
         })
         .eq("id", id);
 
       if (error) {
         console.error("Error al actualizar usuario:", error);
-        alert("Error al actualizar usuario: " + error.message); // <--- Mensaje al usuario
+        alert("Error al actualizar usuario: " + error.message);
       } else {
         setUsuarios((prev) =>
           prev.map((usuario) =>
@@ -99,11 +99,11 @@ nuevoCorreo, telefono: nuevoTelefono }
               : usuario
           )
         );
-        alert("Usuario actualizado correctamente."); // <--- Mensaje al usuario
+        alert("Usuario actualizado correctamente.");
       }
     } catch (error) {
       console.error("Error inesperado al actualizar usuario:", error);
-      alert("Error inesperado al actualizar usuario."); // <--- Mensaje al usuario
+      alert("Error inesperado al actualizar usuario.");
     }
   };
 
@@ -116,7 +116,7 @@ nuevoCorreo, telefono: nuevoTelefono }
 
       if (error) {
         console.error("Error al eliminar la imagen:", error);
-        alert("Error al eliminar la imagen: " + error.message); // <--- Mensaje al usuario
+        alert("Error al eliminar la imagen: " + error.message);
       } else {
         setFotos((prevFotos) => prevFotos.filter((foto) => foto.id !==
           imagenId));
@@ -128,11 +128,11 @@ nuevoCorreo, telefono: nuevoTelefono }
               imagenId),
           }))
         );
-        alert("Imagen eliminada correctamente."); // <--- Mensaje al usuario
+        alert("Imagen eliminada correctamente.");
       }
     } catch (error) {
       console.error("Error inesperado al eliminar la imagen:", error);
-      alert("Error inesperado al eliminar la imagen."); // <--- Mensaje al usuario
+      alert("Error inesperado al eliminar la imagen.");
     }
   };
 
@@ -176,7 +176,6 @@ nuevoCorreo, telefono: nuevoTelefono }
                 />
               </td>
               <td>
-                {/* <--- CAMBIO AQUÍ: Convertir el correo en un input editable */}
                 <input
                   type="email"
                   value={usuario.correo}
