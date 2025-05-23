@@ -13,7 +13,8 @@ import Listas from './componentes/listas';
 import Pokemon from './componentes/pokemon';
 import Usuarios from './componentes/usuario';
 import Login from './componentes/login';
-import Registro from './componentes/registro/index.jsx'; // <--- CAMBIO AQUÍ: ruta completa al archivo index.jsx
+import Registro from './componentes/registro/index.jsx';
+import Administrador from './componentes/administrador/index.jsx'; // <--- Importar el nuevo componente Administrador
 
 import './App.css';
 
@@ -49,6 +50,7 @@ function App() {
           <Route path="/Aleatorios" element={usuario ? <Aleatorios /> : <Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/admin" element={usuario ? <Administrador /> : <Navigate to="/login" />} /> {/* <--- Nueva ruta para Administrador */}
         </Routes>
       </Router>
     </AppProvider>

@@ -2,9 +2,8 @@
 import { useState } from 'react';
 import { supabase } from '../../supabase';
 import { useNavigate } from 'react-router-dom';
-import Registro from './componentes/registro/Registro.jsx';
 
-function Registro() {
+function Registro() { // Esta es la única declaración de 'Registro' necesaria
   const [formulario, setFormulario] = useState({
     nombre: '',
     correo: '',
